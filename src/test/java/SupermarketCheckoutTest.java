@@ -93,6 +93,19 @@ public class SupermarketCheckoutTest {
         assertThatTotalPriceIsEqualTo(12);
     }
 
+    @Test
+    public void shouldChooseBestDiscount() throws Exception {
+        setUpProductPrice(APPLE, 5);
+        setUpDiscounts(
+                discount(APPLE, 2, 20),
+                discount(APPLE, 4, 15)
+        );
+
+        addProducts(APPLE, APPLE, APPLE, APPLE);
+
+        assertThatTotalPriceIsEqualTo(16);
+    }
+
     private static Promotions.Discount discount(String product, int numberOfItems, int discount) {
         return new Promotions.Discount(product, numberOfItems, discount);
     }
