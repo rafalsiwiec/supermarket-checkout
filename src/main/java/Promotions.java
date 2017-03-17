@@ -1,28 +1,25 @@
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collector;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Promotions {
 
     private final Pricing pricing;
-    private final Map<String, Discount> disountsForProducts;
+    private final Map<String, List<Discount>> disountsForProducts;
 
     public Promotions(Pricing pricing, Collection<Discount> disounts) {
         this.pricing = pricing;
         this.disountsForProducts = disounts.stream()
-                .collect(Collectors.toMap(d -> d.product, Function.identity()));
+                .collect(Collectors.groupingBy(d -> d.product));
     }
 
     public int calculatePrice(String product, int numberOfItems) {
-        Discount discount = disountsForProducts.getOrDefault(product, NO_DISCOUNT);
+        List<Discount> discounts = disountsForProducts.getOrDefault(product, Collections.emptyList());
         int itemPrice = pricing.getPrice(product);
-        return discount.calculatePrice(numberOfItems, itemPrice);
+        OptionalInt potentialPrice = discounts.stream()
+                .mapToInt(discount -> discount.calculatePrice(numberOfItems, itemPrice))
+                .min();
+        return potentialPrice.orElseGet(() -> numberOfItems * itemPrice);
     }
-
-    private static final Discount NO_DISCOUNT = new Discount("", -1, 0);
 
     public static class Discount {
         public final String product;

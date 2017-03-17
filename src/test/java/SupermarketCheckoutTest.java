@@ -46,12 +46,12 @@ public class SupermarketCheckoutTest {
 
     @Test
     public void shouldApplyPromotion() throws Exception {
-        setUpProductPrice(APPLE, 50);
+        setUpProductPrice(APPLE, 5);
         setUpDiscounts(discount(APPLE, 2, 10));
 
         addProducts(APPLE, APPLE);
 
-        assertThatTotalPriceIsEqualTo(90);
+        assertThatTotalPriceIsEqualTo(9);
     }
 
     @Test
@@ -78,6 +78,19 @@ public class SupermarketCheckoutTest {
         addProducts(APPLE, APPLE, APPLE);
 
         assertThatTotalPriceIsEqualTo(16 + 10);
+    }
+
+    @Test
+    public void shouldChooseOneOfMultipleDiscountsForParticularProduct() throws Exception {
+        setUpProductPrice(APPLE, 5);
+        setUpDiscounts(
+                discount(APPLE, 2, 10),
+                discount(APPLE, 3, 20)
+        );
+
+        addProducts(APPLE, APPLE, APPLE);
+
+        assertThatTotalPriceIsEqualTo(12);
     }
 
     private static Promotions.Discount discount(String product, int numberOfItems, int discount) {
